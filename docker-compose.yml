@@ -12,6 +12,8 @@ services:
       dockerfile: Messenger.API/Dockerfile
     ports:
       - 8080:80
+    environment:
+      DB_CONNECTION_STRING: "User ID=messages;Password=password;Host=postgres_image;Database=messages;Port=5432"
     networks:
       - messengerapi
 
