@@ -1,0 +1,32 @@
+version: '3.4'
+
+networks:
+  messengerapi:
+    driver: bridge
+
+services:
+  messenger.api:
+    image: ${DOCKER_REGISTRY-}messengerapi
+    build:
+      context: .
+      dockerfile: Messenger.API/Dockerfile
+    ports:
+      - 8080:80
+    networks:
+      - messengerapi
+
+  postgres_image:
+    image: postgres
+    ports:
+      - "5432"
+    restart: always
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "messages"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "messages"
+    networks:
+      - messengerapi
+volumes:
+  db_volume:

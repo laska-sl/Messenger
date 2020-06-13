@@ -1,0 +1,67 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-success">
+    <a class="navbar-brand">Messages clients</a>
+</nav>
+
+<div class="row">
+    <div class="col-4">
+        <div class="text-center">
+            <h1>White a message</h1>
+        </div>
+        <br>
+        <form #messageForm="ngForm" (ngSubmit)="sendMessage()">
+            <div class="form-group">
+                <textarea class="form-control" name="message" id="message" cols="100" rows="3" maxlength="128"
+                    style="resize:none;" [(ngModel)]="message.text" required></textarea>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success" type="submit" [disabled]="!messageForm.valid">Send</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-4">
+        <div class="text-center">
+            <h1>Messages list</h1>
+        </div>
+        <div class="alert alert-success" *ngFor="let message of messages">
+            <div class="row">
+                <div class="col-2">{{message.number}}</div>
+                <div class="col-7">{{message.text}}</div>
+                <div class="col-3">{{message.createdAt | date:'short'}}</div>
+            </div>
+        </div>
+    </div>
+    <div class=" col-4">
+        <div class="text-center">
+            <h1>Show messages in interval</h1>
+        </div>
+        <br>
+        <form #dateIntervalForm="ngForm">
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="from">From</label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="datetime-local" name="from" [(ngModel)]="dateFrom" required>
+                </div>
+                <br>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="To">To</label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="datetime-local" name="To" [(ngModel)]="dateTo" required>
+                </div>
+                <br>
+            </div>
+            <div class="form-group text-center">
+                <p *ngIf="dateFrom > dateTo">Date FROM should be earlier than date TO</p>
+                <button class="btn btn-success" (click)="showMessages()"
+                    [disabled]="!dateIntervalForm.valid || dateFrom > dateTo">Show</button>
+            </div>
+        </form>
+        <div class="alert alert-success" *ngFor="let message of foundMessages">
+            <div class="row">
+                <div class="col-2">{{message.number}}</div>
+                <div class="col-7">{{message.text}}</div>
+                <div class="col-3">{{message.createdAt | date:'short'}}</div>
+            </div>
+        </div>
+    </div>
+</div>
