@@ -16,14 +16,16 @@ services:
       DB_CONNECTION_STRING: "User ID=messages;Password=password;Host=postgres_image;Database=messages;Port=5432"
     networks:
       - messengerapi
+    depends_on:
+      - postgres_image
 
   postgres_image:
     image: postgres
     ports:
       - "5432"
-    restart: always
     volumes:
-      - db_volume:/var/lib/postgresql/data
+      - postgresdata:/var/lib/postgresql/data/
+      - ./dbscripts:/docker-entrypoint-initdb.d/
     environment:
       POSTGRES_USER: "messages"
       POSTGRES_PASSWORD: "password"
@@ -31,4 +33,4 @@ services:
     networks:
       - messengerapi
 volumes:
-  db_volume:
+  postgresdata:

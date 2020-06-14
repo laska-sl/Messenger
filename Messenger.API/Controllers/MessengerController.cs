@@ -23,6 +23,9 @@ namespace Messenger.API.Controllers
             this.messageService = messageService;
         }
 
+        /// <param name="dateIntervalParams">Date interval object with two properties: DATE FROM and DATE TO in "yyyy-mm-dd hh:mm:ss" format.</param>
+        /// <returns>A list of messages</returns>
+
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Message>), StatusCodes.Status200OK)]
         [SwaggerOperation(
