@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 using Messenger.Data.Models;
-
-using Microsoft.Extensions.Configuration;
 
 using Npgsql;
 
@@ -27,6 +24,8 @@ namespace Messenger.Data.Services
 
                 using (var command = connection.CreateCommand())
                 {
+                    message.CreatedAt = DateTime.Now;
+
                     command.CommandText = $"INSERT INTO messages (text, createdat, number) values ('{message.Text}', TIMESTAMP '{message.CreatedAt}', '{message.Number}')";
 
                     command.ExecuteNonQuery();
