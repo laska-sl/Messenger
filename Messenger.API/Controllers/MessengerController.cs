@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,7 +52,12 @@ namespace Messenger.API.Controllers
         {
             var message = await this.messageService.GetMessageById(id, cancellationToken);
 
-            return this.Ok(message);
+            if (message != null)
+            {
+                return this.Ok(message);
+            }
+
+            return this.NoContent();
         }
 
         [HttpPost]
@@ -62,6 +68,8 @@ namespace Messenger.API.Controllers
         public async Task<IActionResult> GetMessagesInInterval(MessageDTO messageDTO, CancellationToken cancellationToken)
         {
             var message = this.mapper.Map<Message>(messageDTO);
+
+            message.CreatedAt = DateTime.Now;
 
             await this.messageService.CreateNewMessage(message, cancellationToken);
 

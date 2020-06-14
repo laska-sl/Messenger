@@ -26,8 +26,6 @@ namespace Messenger.Data.Services
 
                 using (var command = connection.CreateCommand())
                 {
-                    message.CreatedAt = DateTime.Now;
-
                     command.CommandText = $"INSERT INTO messages (text, createdat, number) values ('{message.Text}', TIMESTAMP '{message.CreatedAt}', '{message.Number}')";
 
                     await command.ExecuteNonQueryAsync(cancellationToken);
@@ -37,8 +35,6 @@ namespace Messenger.Data.Services
 
         public async Task<Message> GetMessageById(int id, CancellationToken cancellationToken)
         {
-            var message = new Message();
-
             using (var connection = new NpgsqlConnection(this.connectionString))
             {
                 await connection.OpenAsync(cancellationToken);
@@ -49,23 +45,23 @@ namespace Messenger.Data.Services
 
                     using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                     {
-                        while (await reader.ReadAsync(cancellationToken))
+                        await reader.ReadAsync(cancellationToken);
+
+                        var message = new Message
                         {
-                            message.Text = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("text"), cancellationToken);
-                            message.CreatedAt = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("createdat"), cancellationToken);
-                            message.Number = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("number"), cancellationToken);
-                        }
+                            Text = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("text"), cancellationToken),
+                            CreatedAt = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("createdat"), cancellationToken),
+                            Number = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("number"), cancellationToken)
+                        };
+
+                        return message;
                     }
                 }
             }
-
-            return message;
         }
 
         public async Task<IEnumerable<Message>> GetMessagesInInterval(DateIntervalParams dateIntervalParams, CancellationToken cancellationToken)
         {
-            var messages = new List<Message>();
-
             using (var connection = new NpgsqlConnection(this.connectionString))
             {
                 await connection.OpenAsync(cancellationToken);
@@ -78,6 +74,8 @@ namespace Messenger.Data.Services
 
                     using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                     {
+                        var messages = new List<Message>();
+
                         while (await reader.ReadAsync(cancellationToken))
                         {
                             var message = new Message
@@ -89,11 +87,11 @@ namespace Messenger.Data.Services
 
                             messages.Add(message);
                         }
+
+                        return messages;
                     }
                 }
             }
-
-            return messages;
         }
     }
 }

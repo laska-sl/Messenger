@@ -40,7 +40,7 @@ namespace Messenger.API
                 {
                     Version = "v1",
                     Title = "Messenger API",
-                    Description = "A test task for koshelek.ru",
+                    Description = "A test task for Koshelek.ru",
                     Contact = new OpenApiContact
                     {
                         Name = "Vyacheslav Lasukov",
