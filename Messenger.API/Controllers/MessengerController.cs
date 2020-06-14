@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Messenger.Data.DTOs;
 using Messenger.Data.Models;
@@ -32,9 +34,9 @@ namespace Messenger.API.Controllers
         [SwaggerOperation(
             Summary = "Returns messages in given date/datetime interval"
         )]
-        public IActionResult GetMessagesInInterval([FromQuery] DateIntervalParams dateIntervalParams)
+        public async Task<IActionResult> GetMessagesInInterval([FromQuery] DateIntervalParams dateIntervalParams, CancellationToken cancellationToken)
         {
-            var messages = this.messageService.GetMessagesInInterval(dateIntervalParams);
+            var messages = await this.messageService.GetMessagesInInterval(dateIntervalParams, cancellationToken);
 
             return this.Ok(messages);
         }
@@ -45,9 +47,9 @@ namespace Messenger.API.Controllers
         [SwaggerOperation(
             Summary = "Returns message by given Id"
         )]
-        public IActionResult GetMessageById(int id)
+        public async Task<IActionResult> GetMessageById(int id, CancellationToken cancellationToken)
         {
-            var message = this.messageService.GetMessageById(id);
+            var message = await this.messageService.GetMessageById(id, cancellationToken);
 
             return this.Ok(message);
         }
@@ -57,11 +59,11 @@ namespace Messenger.API.Controllers
         [SwaggerOperation(
             Summary = "Creates new message"
         )]
-        public IActionResult GetMessagesInInterval(MessageDTO messageDTO)
+        public async Task<IActionResult> GetMessagesInInterval(MessageDTO messageDTO, CancellationToken cancellationToken)
         {
             var message = this.mapper.Map<Message>(messageDTO);
 
-            this.messageService.CreateNewMessage(message);
+            await this.messageService.CreateNewMessage(message, cancellationToken);
 
             return this.Created("GetMessage", message);
         }

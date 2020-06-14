@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Messenger.Data.Models;
 
@@ -16,11 +18,11 @@ namespace Messenger.Data.Services
             this.connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
         }
 
-        public void CreateNewMessage(Message message)
+        public async Task CreateNewMessage(Message message, CancellationToken cancellationToken)
         {
             using (var connection = new NpgsqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync(cancellationToken);
 
                 using (var command = connection.CreateCommand())
                 {
@@ -28,30 +30,30 @@ namespace Messenger.Data.Services
 
                     command.CommandText = $"INSERT INTO messages (text, createdat, number) values ('{message.Text}', TIMESTAMP '{message.CreatedAt}', '{message.Number}')";
 
-                    command.ExecuteNonQuery();
+                    await command.ExecuteNonQueryAsync(cancellationToken);
                 }
             }
         }
 
-        public Message GetMessageById(int id)
+        public async Task<Message> GetMessageById(int id, CancellationToken cancellationToken)
         {
             var message = new Message();
 
             using (var connection = new NpgsqlConnection(this.connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync(cancellationToken);
 
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = $"SELECT * FROM messages WHERE Id={id}";
 
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync(cancellationToken))
                         {
-                            message.Text = reader.GetString(reader.GetOrdinal("text"));
-                            message.CreatedAt = reader.GetDateTime(reader.GetOrdinal("createdat"));
-                            message.Number = reader.GetInt32(reader.GetOrdinal("number"));
+                            message.Text = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("text"), cancellationToken);
+                            message.CreatedAt = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("createdat"), cancellationToken);
+                            message.Number = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("number"), cancellationToken);
                         }
                     }
                 }
@@ -60,47 +62,13 @@ namespace Messenger.Data.Services
             return message;
         }
 
-        public IEnumerable<Message> GetAllMessages()
+        public async Task<IEnumerable<Message>> GetMessagesInInterval(DateIntervalParams dateIntervalParams, CancellationToken cancellationToken)
         {
             var messages = new List<Message>();
 
             using (var connection = new NpgsqlConnection(this.connectionString))
             {
-                connection.Open();
-
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText = "SELECT * FROM messages";
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var message = new Message
-                            {
-                                Text = reader.GetString(reader.GetOrdinal("text")),
-                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("createdat")),
-                                Number = reader.GetInt32(reader.GetOrdinal("number"))
-                            };
-
-                            messages.Add(message);
-                        }
-                    }
-
-                    command.ExecuteNonQuery();
-                }
-            }
-
-            return messages;
-        }
-
-        public IEnumerable<Message> GetMessagesInInterval(DateIntervalParams dateIntervalParams)
-        {
-            var messages = new List<Message>();
-
-            using (var connection = new NpgsqlConnection(this.connectionString))
-            {
-                connection.Open();
+                await connection.OpenAsync(cancellationToken);
 
                 using (var command = connection.CreateCommand())
                 {
@@ -108,22 +76,20 @@ namespace Messenger.Data.Services
 
                     command.CommandText = $"SELECT * FROM messages WHERE createdat BETWEEN '{dateIntervalParams.From}' AND '{dateTo}'";
 
-                    using (var reader = command.ExecuteReader())
+                    using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                     {
-                        while (reader.Read())
+                        while (await reader.ReadAsync(cancellationToken))
                         {
                             var message = new Message
                             {
-                                Text = reader.GetString(reader.GetOrdinal("text")),
-                                CreatedAt = reader.GetDateTime(reader.GetOrdinal("createdat")),
-                                Number = reader.GetInt32(reader.GetOrdinal("number"))
+                                Text = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("text"), cancellationToken),
+                                CreatedAt = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("createdat"), cancellationToken),
+                                Number = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("number"), cancellationToken)
                             };
 
                             messages.Add(message);
                         }
                     }
-
-                    command.ExecuteNonQuery();
                 }
             }
 

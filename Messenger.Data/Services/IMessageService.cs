@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Messenger.Data.Models;
 
@@ -6,12 +8,10 @@ namespace Messenger.Data.Services
 {
     public interface IMessageService
     {
-        void CreateNewMessage(Message message);
+        Task CreateNewMessage(Message message, CancellationToken cancellationToken);
 
-        Message GetMessageById(int id);
+        Task<Message> GetMessageById(int id, CancellationToken cancellationToken);
 
-        IEnumerable<Message> GetAllMessages();
-
-        IEnumerable<Message> GetMessagesInInterval(DateIntervalParams dateIntervalParams);
+        Task<IEnumerable<Message>> GetMessagesInInterval(DateIntervalParams dateIntervalParams, CancellationToken cancellationToken);
     }
 }
