@@ -13,8 +13,6 @@ namespace Messenger.Data.Services
 {
     public class MessageRepository : IMessageService
     {
-        private readonly IConfiguration configuration;
-
         private readonly string connectionString;
 
         public MessageRepository(IConfiguration configuration)
@@ -52,16 +50,19 @@ namespace Messenger.Data.Services
 
                     using (var reader = await command.ExecuteReaderAsync(cancellationToken))
                     {
-                        await reader.ReadAsync(cancellationToken);
-
-                        var message = new Message
+                        while (await reader.ReadAsync(cancellationToken))
                         {
-                            Text = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("text"), cancellationToken),
-                            CreatedAt = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("createdat"), cancellationToken),
-                            Number = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("number"), cancellationToken)
-                        };
+                            var message = new Message
+                            {
+                                Text = await reader.GetFieldValueAsync<string>(reader.GetOrdinal("text"), cancellationToken),
+                                CreatedAt = await reader.GetFieldValueAsync<DateTime>(reader.GetOrdinal("createdat"), cancellationToken),
+                                Number = await reader.GetFieldValueAsync<int>(reader.GetOrdinal("number"), cancellationToken)
+                            };
+                            
+                            return message;
+                        }
 
-                        return message;
+                        return null;
                     }
                 }
             }
