@@ -45,6 +45,7 @@ namespace Messenger.API.Controllers
         [HttpGet]
         [Route("{id}", Name = "GetMessageById")]
         [ProducesResponseType(typeof(Message), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Message), StatusCodes.Status204NoContent)]
         [SwaggerOperation(
             Summary = "Returns message by given Id"
         )]
