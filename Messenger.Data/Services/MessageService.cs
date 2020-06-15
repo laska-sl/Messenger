@@ -5,17 +5,24 @@ using System.Threading.Tasks;
 
 using Messenger.Data.Models;
 
+using Microsoft.Extensions.Configuration;
+
 using Npgsql;
 
 namespace Messenger.Data.Services
 {
     public class MessageRepository : IMessageService
     {
+        private readonly IConfiguration configuration;
+
         private readonly string connectionString;
 
-        public MessageRepository()
+        public MessageRepository(IConfiguration configuration)
         {
             this.connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+            // For development purposes
+            // this.connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task CreateNewMessage(Message message, CancellationToken cancellationToken)

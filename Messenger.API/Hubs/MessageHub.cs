@@ -12,13 +12,13 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Messenger.API.Hubs
 {
-    public class MessageHub : Hub
+    public abstract class MessageHub : Hub
     {
         private readonly IMapper mapper;
 
         private readonly IMessageService messageService;
 
-        public MessageHub(IMapper mapper, IMessageService messageService)
+        protected MessageHub(IMapper mapper, IMessageService messageService)
         {
             this.mapper = mapper;
             this.messageService = messageService;
