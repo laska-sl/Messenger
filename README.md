@@ -33,7 +33,7 @@
 
 Or open .sln file and run project.
 
-#### Start the frontend
+### Start the frontend
 
 1. Open a command prompt (terminal) under the root
 2. `cd Messenger-SPA`

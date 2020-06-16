@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 using AutoMapper;
 
@@ -12,19 +10,19 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Messenger.API.Hubs
 {
-    public abstract class MessageHub : Hub
+    public class MessageHub : Hub
     {
         private readonly IMapper mapper;
 
         private readonly IMessageService messageService;
 
-        protected MessageHub(IMapper mapper, IMessageService messageService)
+        public MessageHub(IMapper mapper, IMessageService messageService)
         {
             this.mapper = mapper;
             this.messageService = messageService;
         }
 
-        public async Task NewMessage(MessageDTO messageDTO, CancellationToken cancellationToken)
+        public void NewMessage(MessageDTO messageDTO)
         {
             var message = this.mapper.Map<Message>(messageDTO);
 
@@ -32,14 +30,14 @@ namespace Messenger.API.Hubs
 
             try
             {
-                await this.messageService.CreateNewMessage(message, cancellationToken);
+                 this.messageService.CreateNewMessage(message, default);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
 
-            await this.Clients.All.SendAsync("NewMessage", message, cancellationToken);
+            this.Clients.All.SendAsync("NewMessage", message);
         }
     }
 }
