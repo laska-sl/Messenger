@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using AutoMapper;
 
@@ -22,7 +23,7 @@ namespace Messenger.API.Hubs
             this.messageService = messageService;
         }
 
-        public void NewMessage(MessageDTO messageDTO)
+        public async Task NewMessage(MessageDTO messageDTO)
         {
             var message = this.mapper.Map<Message>(messageDTO);
 
@@ -30,14 +31,14 @@ namespace Messenger.API.Hubs
 
             try
             {
-                 this.messageService.CreateNewMessage(message, default);
+                 await this.messageService.CreateNewMessage(message, default);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                
             }
 
-            this.Clients.All.SendAsync("NewMessage", message);
+            await this.Clients.All.SendAsync("NewMessage", message);
         }
     }
 }

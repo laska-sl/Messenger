@@ -20,7 +20,7 @@ namespace Messenger.Data.Services
             this.connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
             // For development purposes
-            this.connectionString = configuration.GetConnectionString("DefaultConnection");
+            // this.connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task CreateNewMessage(Message message, CancellationToken cancellationToken)
