@@ -6,7 +6,6 @@
 
 **Real-time communication:** SignalR  
 **API Documentation:** Swagger  
-**Logging:** Built-in from Microsoft
 
 ## Start project with Docker
 
